@@ -140,6 +140,7 @@ function main(numProcessed) {
     }
 
     doc.save('out.pdf');
+    console.log('\nSuccess! Saved to out.pdf');
 }
 
 async function setup() {
@@ -175,7 +176,6 @@ async function setup() {
 }
 
 setup().then((numProcessed) => {
-    console.log(`Processed ${numProcessed} qr codes`);
     main(numProcessed);
 }).catch((err) => {
     console.error(err);
