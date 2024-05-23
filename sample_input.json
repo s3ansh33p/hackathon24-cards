@@ -1,0 +1,30 @@
+{
+    "teams": [
+        {
+            "name": "A team name",
+            "members": [
+                {
+                    "name": "Short Name",
+                    "code": "9c3f9f640806c12ab0b9b11f"
+                },
+                {
+                    "name": "Pretty Lengthy Name",
+                    "code": "06f6d42e4ab8952b23d5160a"
+                }
+            ]
+        },
+        {
+            "name": "My Example Longer Team Name",
+            "members": [
+                {
+                    "name": "Example",
+                    "code": "38790a24b04a66b5994d24bf"
+                },
+                {
+                    "name": "Jo Doe Smoe",
+                    "code": "23288734eaaca93886c53a25"
+                }
+            ]
+        }
+    ]
+}
