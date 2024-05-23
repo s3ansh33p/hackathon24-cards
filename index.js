@@ -98,9 +98,7 @@ function main(numProcessed) {
         let x = marginX + xIndex * (id.width + marginX);
         let y = marginY + yIndex * (id.height + marginY);
 
-        // left pad spaces to make it easier to read
-        const formattedCurrent = " ".repeat(3 - (i + 1).toString().length) + (i + 1);
-        console.log(`[${formattedCurrent}] x=${x} y=${y}`);
+        console.log(`[${i < 9 ? " " + (i+1) : (i+1)}] ${data[i].team} - ${data[i].name}`);
         addIDCard(data[i], x, y);
 
         // add page if needed
