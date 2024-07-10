@@ -6,6 +6,8 @@ require('./Wavehaus-66Book.js');
 require('./Wavehaus-128Bold.js');
 const input = require('./input.json');
 
+const TWO_SIDED = true;
+
 // create new pdf
 const doc = new jsPDF({
     orientation: 'portrait',
@@ -14,7 +16,7 @@ const doc = new jsPDF({
 });
 
 // read background image from our canva design
-const imgData = fs.readFileSync(path.join(__dirname, '60x90-Background.png'));
+const imgData = fs.readFileSync(path.join(__dirname, '56x83BG-P.png'));
 
 const colors = {
     primary: '#FFB001',
@@ -23,30 +25,28 @@ const colors = {
 
 // values taken from our canva design
 const id = {
-    width: 60,
-    height: 90,
+    width: 56,
+    height: 83,
     text: [
         {
             key: 'name',
             font: 'Wavehaus-128Bold',
             color: colors.primary,
             size: 20,
-            y: 35
+            y: 30
         },
         {
             key: 'team',
             font: 'Wavehaus-66Book',
             color: colors.primary,
             size: 18,
-            y: 45
+            y: 40
         },
     ],
     qr: {
         // will ultimately be qr code
-        x: 12.5,
-        y: 50,
-        width: 35,
-        height: 35,
+        y: 45,
+        size: 30,
         opts: {
             errorCorrectionLevel: 'H',
             type: 'image/jpeg',
@@ -63,6 +63,7 @@ const id = {
 // sizing for our lanyard id cards (3x3 grid)
 const idPerRow = 3;
 const idPerCol = 3;
+const itemsPerPage = idPerRow * idPerCol;
 
 // calculations
 const pageWidth = doc.internal.pageSize.getWidth();
@@ -101,9 +102,25 @@ function main(numProcessed) {
         console.log(`[${i < 9 ? " " + (i+1) : (i+1)}] ${data[i].team} - ${data[i].name}`);
         addIDCard(data[i], x, y);
 
-        // add page if needed
-        if (i + 1 < numProcessed && (i + 1) % (idPerRow * idPerCol) === 0) {
+        const isLastItem = i + 1 === numProcessed;
+        const needNewPage = i + 1 < numProcessed && (i + 1) % (idPerRow * idPerCol) === 0;
+
+        if (needNewPage || isLastItem && TWO_SIDED) {
             doc.addPage();
+            // if TWO_SIDED, need to get previous items and add to the back
+            // however, must flip the x values as they will flip on page turn
+            if (TWO_SIDED) {
+                let itemsOnPage = (i + 1) % itemsPerPage;
+                if (itemsOnPage == 0) itemsOnPage = itemsPerPage;
+                for (let j = i; j > i - itemsOnPage; j--) {
+                    const xIndex = j % idPerRow;
+                    const yIndex = Math.floor(j / idPerRow) % idPerCol;
+                    x = marginX + (idPerRow - xIndex - 1) * (id.width + marginX);
+                    y = marginY + yIndex * (id.height + marginY);
+                    addIDCard(data[j], x, y);
+                }
+                if (!isLastItem) doc.addPage();
+            }
         }
     }
 
@@ -135,7 +152,9 @@ function main(numProcessed) {
         }
 
         // add qr code
-        doc.addImage(data.image, 'JPEG', x + id.qr.x, y + id.qr.y, id.qr.width, id.qr.height);
+        const qrX = id.qr.x || (id.width - id.qr.size) / 2;
+        const qrY = id.qr.y || id.size / 2;
+        doc.addImage(data.image, 'JPEG', x + qrX, y + qrY, id.qr.size, id.qr.size);
         
     }
 
@@ -153,8 +172,6 @@ async function setup() {
         const team = input.teams[i];
         for (let j = 0; j < team.members.length; j++) {
             const member = team.members[j];
-            // for the sake of example, we'll set the member code random hex bytes
-            member.code = crypto.randomBytes(12).toString('hex');
             member.image = await generateQRCode(member.code);
             numProcessed++;
         }
