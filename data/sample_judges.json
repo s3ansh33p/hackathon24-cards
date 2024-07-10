@@ -1,0 +1,6 @@
+{
+    "members": [
+        { "first_name": "Something", "last_name": "Cool" },
+        { "first_name": "Business", "last_name": "Person" }
+    ]
+}

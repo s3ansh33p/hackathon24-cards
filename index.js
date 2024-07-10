@@ -130,6 +130,38 @@ const DESIGNS = {
                 height: 286/742 * 30 // aspect ratio of image
             }
         }
+    },
+    judges: {
+        background: '56x83BG-J.png',
+        data: 'judges.json',
+        output: 'judges.pdf',
+        layout:  {
+            width: 56,
+            height: 83,
+            text: [
+                {
+                    key: 'first_name',
+                    font: 'Wavehaus-128Bold',
+                    color: colors.primary,
+                    size: 20,
+                    y: 35
+                },
+                {
+                    key: 'last_name',
+                    font: 'Wavehaus-128Bold',
+                    color: colors.primary,
+                    size: 20,
+                    y: 43
+                },
+                {
+                    key: '!Judge',
+                    font: 'Wavehaus-66Book',
+                    color: colors.white,
+                    size: 16,
+                    y: 52
+                },
+            ]
+        }
     }
 }
 
@@ -222,7 +254,7 @@ function main(numProcessed) {
     }
 
     function addIDCard(data, x, y) {
-        doc.rect(x, y, id.width, id.height);
+        // doc.rect(x, y, id.width, id.height);
         doc.addImage(imgData, 'PNG', x, y, id.width, id.height);
 
 
