@@ -6,7 +6,7 @@ require('./assets/Wavehaus-66Book.js');
 require('./assets/Wavehaus-128Bold.js');
 
 const TWO_SIDED = true;
-const CUR_DESIGN = 'committee';
+const CUR_DESIGN = 'mentors';
 
 const colors = {
     white: '#FFFFFF',
@@ -85,7 +85,7 @@ const DESIGNS = {
                     y: 52
                 },
                 {
-                    key: 'coordinator',
+                    key: 'role2',
                     font: 'Wavehaus-66Book',
                     color: colors.white,
                     size: 16,
@@ -96,7 +96,7 @@ const DESIGNS = {
     },
     mentors: {
         background: '56x83BG-M.png',
-        data: 'sample_committee.json',
+        data: 'mentors.json',
         output: 'mentors.pdf',
         layout:  {
             width: 56,
@@ -116,8 +116,19 @@ const DESIGNS = {
                     size: 20,
                     y: 43
                 },
+                {
+                    key: '!Mentor',
+                    font: 'Wavehaus-66Book',
+                    color: colors.white,
+                    size: 16,
+                    y: 52
+                },
             ],
-            // will have company logo on each
+            image: {
+                y: 62,
+                width: 30,
+                height: 286/742 * 30 // aspect ratio of image
+            }
         }
     }
 }
@@ -222,8 +233,12 @@ function main(numProcessed) {
             doc.setTextColor(text.color);
             const textX = text.x || id.width / 2;
             const textY = text.y || id.height / 2;
-            let textToAdd = data[text.key];
-
+            let textToAdd;
+            if (text.key.startsWith('!')) {
+                textToAdd = text.key.substring(1);
+            } else {
+                textToAdd = data[text.key];
+            }
             // check if it will overflow, as if so, we'll reduce the font size so it fits
             const textWidth = doc.getStringUnitWidth(textToAdd) * text.size / doc.internal.scaleFactor;
             // we don't want the text to right up against the edge so we add a margin
@@ -242,6 +257,13 @@ function main(numProcessed) {
             const qrX = id.qr.x || (id.width - id.qr.size) / 2;
             const qrY = id.qr.y || id.size / 2;
             doc.addImage(data.image, 'JPEG', x + qrX, y + qrY, id.qr.size, id.qr.size);
+        }
+
+        if (id.image && data.image) {
+            const imgX = id.image.x || (id.width - id.image.width) / 2;
+            const imgY = id.image.y || id.size / 2;
+            const imgData = fs.readFileSync(path.join(__dirname, 'assets', data.image));
+            doc.addImage(imgData, 'PNG', x + imgX, y + imgY, id.image.width, id.image.height);
         }
         
     }
