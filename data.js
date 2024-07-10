@@ -3,10 +3,9 @@ const fs = require('fs');
 require('dotenv').config();
 
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+const THQ = new TidyHQ(ACCESS_TOKEN);
 
-async function main() {
-    const THQ = new TidyHQ(ACCESS_TOKEN);
-
+async function getTeamData() {
     const groups = await THQ.Groups.getGroups({search_terms: "2024-Hackathon"});
     if (!groups.success) throw new Error("Failed to get groups");
     const groupId = groups.data[0].id;
@@ -56,8 +55,26 @@ async function main() {
         return acc;
     }, []);
 
-    fs.writeFileSync('input.json', JSON.stringify({teams}));
-
+    fs.writeFileSync('data/teams.json', JSON.stringify({teams}));
+    console.log("Data written to data/teams.json");
 }
 
-main();
+async function getCommitteeData() {
+    const groups = await THQ.Groups.getGroups({search_terms: "2024-Hackathon-Organisers"});
+    if (!groups.success) throw new Error("Failed to get groups");
+    const groupId = groups.data[0].id;
+
+    const contacts = await THQ.Contacts.getContactsInGroup(groupId);
+    if (!contacts.success) throw new Error("Failed to get contacts");
+
+    const data = contacts.data.map(contact => ({
+        first_name: contact.first_name,
+        last_name: contact.last_name
+    }));
+
+    fs.writeFileSync('data/committee.json', JSON.stringify({members: data}));
+    console.log("Data written to data/committee.json");
+}
+
+// getTeamData();
+// getCommitteeData();

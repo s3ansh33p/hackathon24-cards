@@ -2,11 +2,113 @@ const fs = require('fs');
 const path = require('path');
 const { jsPDF } = require('jspdf');
 const QRCode = require('qrcode');
-require('./Wavehaus-66Book.js');
-require('./Wavehaus-128Bold.js');
-const input = require('./input.json');
+require('./assets/Wavehaus-66Book.js');
+require('./assets/Wavehaus-128Bold.js');
 
-const TWO_SIDED = true;
+const TWO_SIDED = false;
+const CUR_DESIGN = 'mentors';
+
+const colors = {
+    primary: '#FFB001',
+    background: '#2F1244'
+}
+
+const DESIGNS = {
+    teams: {
+        background: '56x83BG-P.png',
+        data: 'teams.json',
+        output: 'teams.pdf',
+        layout:  {
+            width: 56,
+            height: 83,
+            text: [
+                {
+                    key: 'name',
+                    font: 'Wavehaus-128Bold',
+                    color: colors.primary,
+                    size: 20,
+                    y: 30
+                },
+                {
+                    key: 'team',
+                    font: 'Wavehaus-66Book',
+                    color: colors.primary,
+                    size: 18,
+                    y: 40
+                },
+            ],
+            qr: {
+                // will ultimately be qr code
+                y: 45,
+                size: 30,
+                opts: {
+                    errorCorrectionLevel: 'H',
+                    type: 'image/jpeg',
+                    quality: 0.3,
+                    margin: 2,
+                    color: {
+                        dark: colors.primary + 'FF',
+                        light: colors.background + 'FF'
+                    }
+                }
+            }
+        }
+    },
+    committee: {
+        background: '56x83BG-C.png',
+        data: 'committee.json',
+        output: 'committee.pdf',
+        layout:  {
+            width: 56,
+            height: 83,
+            text: [
+                {
+                    key: 'first_name',
+                    font: 'Wavehaus-128Bold',
+                    color: colors.primary,
+                    size: 20,
+                    y: 35
+                },
+                {
+                    key: 'last_name',
+                    font: 'Wavehaus-128Bold',
+                    color: colors.primary,
+                    size: 20,
+                    y: 43
+                },
+            ],
+        }
+    },
+    mentors: {
+        background: '56x83BG-M.png',
+        data: 'sample_committee.json',
+        output: 'mentors.pdf',
+        layout:  {
+            width: 56,
+            height: 83,
+            text: [
+                {
+                    key: 'first_name',
+                    font: 'Wavehaus-128Bold',
+                    color: colors.primary,
+                    size: 20,
+                    y: 35
+                },
+                {
+                    key: 'last_name',
+                    font: 'Wavehaus-128Bold',
+                    color: colors.primary,
+                    size: 20,
+                    y: 43
+                },
+            ],
+            // will have company logo on each
+        }
+    }
+}
+
+// load data
+const input = require(`./data/${DESIGNS[CUR_DESIGN].data}`);
 
 // create new pdf
 const doc = new jsPDF({
@@ -16,49 +118,10 @@ const doc = new jsPDF({
 });
 
 // read background image from our canva design
-const imgData = fs.readFileSync(path.join(__dirname, '56x83BG-P.png'));
-
-const colors = {
-    primary: '#FFB001',
-    background: '#2F1244'
-}
+const imgData = fs.readFileSync(path.join(__dirname, 'assets', DESIGNS[CUR_DESIGN].background));
 
 // values taken from our canva design
-const id = {
-    width: 56,
-    height: 83,
-    text: [
-        {
-            key: 'name',
-            font: 'Wavehaus-128Bold',
-            color: colors.primary,
-            size: 20,
-            y: 30
-        },
-        {
-            key: 'team',
-            font: 'Wavehaus-66Book',
-            color: colors.primary,
-            size: 18,
-            y: 40
-        },
-    ],
-    qr: {
-        // will ultimately be qr code
-        y: 45,
-        size: 30,
-        opts: {
-            errorCorrectionLevel: 'H',
-            type: 'image/jpeg',
-            quality: 0.3,
-            margin: 2,
-            color: {
-                dark: colors.primary + 'FF',
-                light: colors.background + 'FF'
-            }
-        }
-    }
-}
+const id = DESIGNS[CUR_DESIGN].layout;
 
 // sizing for our lanyard id cards (3x3 grid)
 const idPerRow = 3;
@@ -81,15 +144,34 @@ function main(numProcessed) {
 
     // converting into single array for easier iteration
     const data = [];
-    for (let i = 0; i < input.teams.length; i++) {
-        const team = input.teams[i];
-        for (let j = 0; j < team.members.length; j++) {
-            const member = team.members[j];
+    if (CUR_DESIGN === 'teams') {
+        for (let i = 0; i < input.teams.length; i++) {
+            const team = input.teams[i];
+            for (let j = 0; j < team.members.length; j++) {
+                const member = team.members[j];
+                data.push({
+                    name: member.name,
+                    team: team.name,
+                    image: member.image
+                });
+            }
+        }
+    } else if (CUR_DESIGN === 'committee') {
+        for (let i = 0; i < input.members.length; i++) {
+            const member = input.members[i];
             data.push({
-                name: member.name,
-                team: team.name,
-                image: member.image
+                first_name: member.first_name,
+                last_name: member.last_name
             });
+        }
+    } else if (CUR_DESIGN === 'mentors') {
+        for (let i = 0; i < input.members.length; i++) {
+            const member = input.members[i];
+            data.push({
+                first_name: member.first_name,
+                last_name: member.last_name
+            });
+            // TBA images
         }
     }
 
@@ -99,7 +181,11 @@ function main(numProcessed) {
         let x = marginX + xIndex * (id.width + marginX);
         let y = marginY + yIndex * (id.height + marginY);
 
-        console.log(`[${i < 9 ? " " + (i+1) : (i+1)}] ${data[i].team} - ${data[i].name}`);
+        if (CUR_DESIGN === 'teams') {
+            console.log(`[${i < 9 ? " " + (i+1) : (i+1)}] ${data[i].team} - ${data[i].name}`);
+        } else {
+            console.log(`[${i < 9 ? " " + (i+1) : (i+1)}] ${data[i].first_name} ${data[i].last_name}`);
+        }
         addIDCard(data[i], x, y);
 
         const isLastItem = i + 1 === numProcessed;
@@ -152,43 +238,48 @@ function main(numProcessed) {
         }
 
         // add qr code
-        const qrX = id.qr.x || (id.width - id.qr.size) / 2;
-        const qrY = id.qr.y || id.size / 2;
-        doc.addImage(data.image, 'JPEG', x + qrX, y + qrY, id.qr.size, id.qr.size);
+        if (id.qr) {
+            const qrX = id.qr.x || (id.width - id.qr.size) / 2;
+            const qrY = id.qr.y || id.size / 2;
+            doc.addImage(data.image, 'JPEG', x + qrX, y + qrY, id.qr.size, id.qr.size);
+        }
         
     }
 
-    doc.save('out.pdf');
-    console.log('\nSuccess! Saved to out.pdf');
+    const outFile = DESIGNS[CUR_DESIGN].output;
+    doc.save(outFile);
+    console.log(`\nSuccess! Saved to ${outFile}`);
 }
 
 async function setup() {
-    // for testing/illustration
-    const crypto = require('crypto');
     // generate qr codes and count number of participants
-    let numProcessed = 0;
-    const promises = [];
-    for (let i = 0; i < input.teams.length; i++) {
-        const team = input.teams[i];
-        for (let j = 0; j < team.members.length; j++) {
-            const member = team.members[j];
-            member.image = await generateQRCode(member.code);
-            numProcessed++;
+    if (CUR_DESIGN === 'teams') {
+        let numProcessed = 0;
+        const promises = [];
+        for (let i = 0; i < input.teams.length; i++) {
+            const team = input.teams[i];
+            for (let j = 0; j < team.members.length; j++) {
+                const member = team.members[j];
+                member.image = await generateQRCode(member.code);
+                numProcessed++;
+            }
         }
-    }
-    await Promise.all(promises);
-    return numProcessed;
-    
-    async function generateQRCode(data) {
-        return new Promise((resolve, reject) => {
-            QRCode.toDataURL(data, id.qr.opts, function (err, url) {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(url);
+        await Promise.all(promises);
+        return numProcessed;
+        
+        async function generateQRCode(data) {
+            return new Promise((resolve, reject) => {
+                QRCode.toDataURL(data, id.qr.opts, function (err, url) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    resolve(url);
+                });
             });
-        });
+        }
+    } else {
+        return input.members.length;
     }
 }
 
