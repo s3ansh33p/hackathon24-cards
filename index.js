@@ -5,10 +5,11 @@ const QRCode = require('qrcode');
 require('./assets/Wavehaus-66Book.js');
 require('./assets/Wavehaus-128Bold.js');
 
-const TWO_SIDED = false;
-const CUR_DESIGN = 'mentors';
+const TWO_SIDED = true;
+const CUR_DESIGN = 'committee';
 
 const colors = {
+    white: '#FFFFFF',
     primary: '#FFB001',
     background: '#2F1244'
 }
@@ -76,6 +77,20 @@ const DESIGNS = {
                     size: 20,
                     y: 43
                 },
+                {
+                    key: 'role',
+                    font: 'Wavehaus-66Book',
+                    color: colors.white,
+                    size: 16,
+                    y: 52
+                },
+                {
+                    key: 'coordinator',
+                    font: 'Wavehaus-66Book',
+                    color: colors.white,
+                    size: 16,
+                    y: 58.5
+                }
             ],
         }
     },
@@ -143,7 +158,7 @@ const marginY = (pageHeight - id.height * idPerCol) / (idPerCol + 1);
 function main(numProcessed) {
 
     // converting into single array for easier iteration
-    const data = [];
+    let data = [];
     if (CUR_DESIGN === 'teams') {
         for (let i = 0; i < input.teams.length; i++) {
             const team = input.teams[i];
@@ -156,23 +171,8 @@ function main(numProcessed) {
                 });
             }
         }
-    } else if (CUR_DESIGN === 'committee') {
-        for (let i = 0; i < input.members.length; i++) {
-            const member = input.members[i];
-            data.push({
-                first_name: member.first_name,
-                last_name: member.last_name
-            });
-        }
-    } else if (CUR_DESIGN === 'mentors') {
-        for (let i = 0; i < input.members.length; i++) {
-            const member = input.members[i];
-            data.push({
-                first_name: member.first_name,
-                last_name: member.last_name
-            });
-            // TBA images
-        }
+    } else {
+        data = input.members;
     }
 
     for (let i = 0; i < numProcessed; i++) {
@@ -189,7 +189,7 @@ function main(numProcessed) {
         addIDCard(data[i], x, y);
 
         const isLastItem = i + 1 === numProcessed;
-        const needNewPage = i + 1 < numProcessed && (i + 1) % (idPerRow * idPerCol) === 0;
+        const needNewPage = i + 1 < numProcessed && (i + 1) % (itemsPerPage) === 0;
 
         if (needNewPage || isLastItem && TWO_SIDED) {
             doc.addPage();

@@ -1,5 +1,5 @@
 {
     "members": [
-        { "first_name": "Someone", "last_name": "Awesome" }
+        { "first_name": "Someone", "last_name": "Awesome", "role": "Cool Person", "coordinator": "" }
     ]
 }

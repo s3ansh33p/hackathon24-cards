@@ -69,7 +69,9 @@ async function getCommitteeData() {
 
     const data = contacts.data.map(contact => ({
         first_name: contact.first_name,
-        last_name: contact.last_name
+        last_name: contact.last_name,
+        role: "", // DEFAULT, for now editing resulting file
+        coordinator: "" // OVERFLOW LINE
     }));
 
     fs.writeFileSync('data/committee.json', JSON.stringify({members: data}));
