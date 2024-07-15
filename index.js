@@ -6,12 +6,13 @@ require('./assets/Wavehaus-66Book.js');
 require('./assets/Wavehaus-128Bold.js');
 
 const TWO_SIDED = true;
-const CUR_DESIGN = 'mentors';
+const CUR_DESIGN = 'teams';
 
 const colors = {
     white: '#FFFFFF',
     primary: '#FFB001',
-    background: '#2F1244'
+    background: '#2F1244',
+    black: '#000000'
 }
 
 const DESIGNS = {
@@ -46,10 +47,10 @@ const DESIGNS = {
                     errorCorrectionLevel: 'H',
                     type: 'image/jpeg',
                     quality: 0.3,
-                    margin: 2,
+                    margin: 1,
                     color: {
-                        dark: colors.primary + 'FF',
-                        light: colors.background + 'FF'
+                        dark: colors.black + 'FF',
+                        light: colors.white + 'FF'
                     }
                 }
             }
