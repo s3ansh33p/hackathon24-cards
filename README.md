@@ -6,6 +6,9 @@ We created our base design in Canva, and exported all layers except text which a
 
 Open sourced as of 24th July 2024 / after the event.
 
+![Example Generated PDF](https://raw.githubusercontent.com/s3ansh33p/hackathon24-cards/main/assets/LanyardPDFExample.png)
+![Lanyards on Display](https://raw.githubusercontent.com/s3ansh33p/hackathon24-cards/main/assets/LanyardExample.png)
+
 ## Reference
 
 To get custom fonts, I used the [jsPDF fontconverter](https://peckconsulting.s3.amazonaws.com/fontconverter/fontconverter.html)
