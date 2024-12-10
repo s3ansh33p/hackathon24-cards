@@ -6,7 +6,7 @@ const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 const THQ = new TidyHQ(ACCESS_TOKEN);
 
 async function getTeamData() {
-    const groups = await THQ.Groups.getGroups({search_terms: "2024-Hackathon"});
+    const groups = await THQ.Groups.getGroups({search_terms: "2024-Hackathon-S2"});
     if (!groups.success) throw new Error("Failed to get groups");
     const groupId = groups.data[0].id;
 
@@ -15,9 +15,9 @@ async function getTeamData() {
 
     const fields = await THQ.CustomFields.getCustomFields();
     if (!fields.success) throw new Error("Failed to get custom fields");
-    const targetField = fields.data.find(field => field.title === "Hackathon 2024 Team");
+    const targetField = fields.data.find(field => field.title === "Hackathon 2024 S2 Team");
 
-    const events = await THQ.Events.getEvents({start_at: "2024-07-12"});
+    const events = await THQ.Events.getEvents({start_at: "2024-12-06"});
     if (!events.success) throw new Error("Failed to get events");
     const eventId = events.data[0].id;
 
@@ -60,7 +60,7 @@ async function getTeamData() {
 }
 
 async function getCommitteeData() {
-    const groups = await THQ.Groups.getGroups({search_terms: "2024-Hackathon-Organisers"});
+    const groups = await THQ.Groups.getGroups({search_terms: "2024-Hackathon-S2-Organisers"});
     if (!groups.success) throw new Error("Failed to get groups");
     const groupId = groups.data[0].id;
 
@@ -78,5 +78,5 @@ async function getCommitteeData() {
     console.log("Data written to data/committee.json");
 }
 
-// getTeamData();
+getTeamData();
 // getCommitteeData();

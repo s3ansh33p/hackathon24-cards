@@ -6,11 +6,11 @@ require('./assets/Wavehaus-66Book.js');
 require('./assets/Wavehaus-128Bold.js');
 
 const TWO_SIDED = true;
-const CUR_DESIGN = 'teams';
+const CUR_DESIGN = 'judges';
 
 const colors = {
     white: '#FFFFFF',
-    primary: '#FFB001',
+    primary: '#B2CDDF',
     background: '#2F1244',
     black: '#000000'
 }
@@ -47,10 +47,10 @@ const DESIGNS = {
                     errorCorrectionLevel: 'H',
                     type: 'image/jpeg',
                     quality: 0.3,
-                    margin: 1,
+                    margin: 2,
                     color: {
-                        dark: colors.black + 'FF',
-                        light: colors.white + 'FF'
+                        dark: colors.primary + 'FF',
+                        light: colors.background + 'FF'
                     }
                 }
             }
@@ -126,9 +126,13 @@ const DESIGNS = {
                 },
             ],
             image: {
-                y: 62,
+                y: 61,
                 width: 30,
-                height: 286/742 * 30 // aspect ratio of image
+                height: 12,
+                vgw: 286/742, // aspect ratio of image
+                wadsih: 394/1536,
+                visagio: 556/2500,
+                deloitte: 136/728
             }
         }
     },
@@ -296,7 +300,11 @@ function main(numProcessed) {
             const imgX = id.image.x || (id.width - id.image.width) / 2;
             const imgY = id.image.y || id.size / 2;
             const imgData = fs.readFileSync(path.join(__dirname, 'assets', data.image));
-            doc.addImage(imgData, 'PNG', x + imgX, y + imgY, id.image.width, id.image.height);
+            const name = data.image.split('.png')[0];
+            const imgHeight = id.image.height;
+            const imgPreHeight = id.image.width * id.image[name];
+            const heightDiff = (imgHeight - imgPreHeight) / 2;
+            doc.addImage(imgData, 'PNG', x + imgX, y + imgY + heightDiff, id.image.width, id.image.width * id.image[name]);
         }
         
     }
