@@ -1,4 +1,4 @@
-const TidyHQ = require("../../module");
+const TidyHQ = require("tidyhq");
 const fs = require('fs');
 require('dotenv').config();
 
